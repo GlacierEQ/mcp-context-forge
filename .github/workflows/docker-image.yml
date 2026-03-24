@@ -150,7 +150,7 @@ jobs:
         if: env.TRIVY_ENABLED == 'true'
         id: trivy
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ env.IMAGE_NAME }}:latest
           format: sarif
