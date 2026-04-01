@@ -9,7 +9,7 @@ authors = [
 ]
 license = { text = "Apache-2.0" }
 dependencies = [
-  "fastmcp==2.11.3",
+  "fastmcp==3.2.0",
   "pydantic>=2.5.0",
   "faker>=19.3.0",
 ]
