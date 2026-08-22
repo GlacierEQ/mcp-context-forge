@@ -6,7 +6,7 @@
 set -e
 
 # Default settings
-HOST=${HOST:-0.0.0.0}
+HOST=${HOST:-127.0.0.1}
 PORT=${PORT:-4444}
 ENV_FILE=${ENV_FILE:-.env}
 LOG_LEVEL=${LOG_LEVEL:-info}
@@ -26,7 +26,7 @@ show_help() {
     echo "Options:"
     echo "  -h, --help           Show this help message"
     echo "  -e, --env FILE       Use specific env file (default: .env)"
-    echo "  -H, --host HOST      Bind to HOST address (default: 0.0.0.0)"
+    echo "  -H, --host HOST      Bind to HOST address (default: 127.0.0.1)"
     echo "  -p, --port PORT      Use PORT (default: 4444)"
     echo "  -l, --log LEVEL      Set log level: debug, info, warning, error, critical (default: info)"
     echo "  -f, --format FORMAT  Set log format: json or text (default: json)"
@@ -98,9 +98,17 @@ if ! [[ "$LOG_FORMAT" =~ ^(json|text)$ ]]; then
     exit 1
 fi
 
-# Create default .env if it doesn't exist
+# Generate a URL-safe value without ever embedding a reusable authority value.
+generate_local_secret() {
+    LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 48
+}
+
+# Create a local, owner-only .env if it doesn't exist.
 if [ ! -f "$ENV_FILE" ]; then
-    echo "Creating default $ENV_FILE..."
+    echo "Creating local configuration $ENV_FILE with fresh credentials..."
+    umask 077
+    BASIC_AUTH_PASSWORD=$(generate_local_secret)
+    AUTH_ENCRYPTION_SECRET=$(generate_local_secret)
     cat > "$ENV_FILE" << EOL
 # Basic Settings
 APP_NAME=MCP_Gateway
@@ -112,13 +120,13 @@ LOG_FORMAT=${LOG_FORMAT}
 
 # Authentication
 BASIC_AUTH_USER=admin
-BASIC_AUTH_PASSWORD=changeme
+BASIC_AUTH_PASSWORD=${BASIC_AUTH_PASSWORD}
 AUTH_REQUIRED=true
-AUTH_ENCRYPTION_SECRET=my-test-salt
+AUTH_ENCRYPTION_SECRET=${AUTH_ENCRYPTION_SECRET}
 
 # Security
 SKIP_SSL_VERIFY=false
-ALLOWED_ORIGINS='["http://localhost", "http://localhost:${PORT}"]'
+ALLOWED_ORIGINS='["http://localhost", "http://localhost:${PORT}", "http://127.0.0.1:${PORT}"]'
 CORS_ENABLED=true
 
 # Transport
