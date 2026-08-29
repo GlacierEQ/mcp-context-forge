@@ -9,7 +9,7 @@ license = { text = "Apache-2.0" }
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-  "fastmcp==3.2.0",
+  "fastmcp==3.2.4",
   "pydantic>=2.5.0",
   "RestrictedPython>=6.0",
   "typing-extensions>=4.5.0",
@@ -28,7 +28,7 @@ sandbox = [
   "numpy>=1.24.0",
   "pandas>=2.0.0",
   "matplotlib>=3.7.0",
-  "requests>=2.33.1",
+  "requests>=2.34.1",
 ]
 
 [build-system]
